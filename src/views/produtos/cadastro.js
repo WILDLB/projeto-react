@@ -8,12 +8,16 @@ import ProdutoService from "../../app/produtoService";
     sku: '',
     descricao: '',
     preco: '',
-    fornecedor: ''
+    fornecedor: '',
+    sucesso: false
  }
 
  class CadastroProduto extends React.Component{
 
-    state = {estadoInicial}
+    state = {
+        estadoInicial,
+        errors: []
+    }
 
     constructor(){
         super()
@@ -31,13 +35,16 @@ import ProdutoService from "../../app/produtoService";
             sku: this.state.sku,
             descricao: this.state.descricao,
             preco: this.state.preco,
-            fornecedor: this.state.fornecedor,
-            sucesso: false
+            fornecedor: this.state.fornecedor
         }
-        
-        this.service.salvar(produto)
-        this.limpaCampos()
-        this.setState({sucesso : true})
+        try{            
+            this.service.salvar(produto)
+            this.limpaCampos()
+            this.setState({sucesso : true})
+        } catch(erro){
+            const errors = erro.errors;
+            this.setState({ errors: errors})
+        }      
     }
 
     limpaCampos = ()=> {
@@ -53,12 +60,24 @@ import ProdutoService from "../../app/produtoService";
                 
                 <div className='card-body'>
 
-                    {
-                        this.state.sucesso &&
+                    {this.state.sucesso &&
+
                         <div class="alert alert-dismissible alert-success">
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             <strong>Cadastro </strong>realizado com sucesso!
                         </div>                      
+                    }
+
+                    {this.state.errors.length > 0 &&
+
+                        this.state.errors.map( msg => {
+                            return (
+                                <div class="alert alert-dismissible alert-danger">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    <strong>Erro! </strong> {msg}
+                                </div>                      
+                            )
+                        })
                     }
                     
                     <div className='row'>                   
